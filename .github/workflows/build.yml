@@ -180,15 +180,18 @@ jobs:
         with:
           ref: ${{ inputs.version }}
 
-      - name: Setup
-        uses: ./.github/actions/setup
-
       - name: Build Docker image
+        working-directory: ./contrib/docker
         run: |
-          docker build --build-arg VERSION=${{ inputs.version }} --build-arg FEATURES="${{ inputs.features }}" -t smartdns-rs:${{ inputs.version }} .
-          docker tag smartdns-rs:${{ inputs.version }} ghcr.io/SamTV12345/smartdns-rs/smartdns:${{ inputs.version }}
-
+          docker build --build-arg VERSION=${{ inputs.version }} -t smartdns-rs:${{ inputs.version }} .
+          docker tag smartdns-rs:${{ inputs.version }} ghcr.io/${{ github.actor }}/smartdns-rs:${{ inputs.version }}
+      -
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push Docker image
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u SamTV12345 --password-stdin
-          docker push ghcr.io/SamTV12345/smartdns-rs:${{ inputs.version }}
+          docker push ghcr.io/${{ github.actor }}/smartdns-rs:${{ inputs.version }}
