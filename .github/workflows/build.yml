@@ -183,7 +183,7 @@ jobs:
       - name: Build Docker image
         working-directory: ./contrib/docker
         run: |
-          docker build --build-arg VERSION=${{ inputs.version }} -t smartdns-rs:${{ inputs.version }} .
+          docker buildx build --platform linux/amd64 --platform linux/arm64 --platform linux/arm/v7 --build-arg VERSION=${{ inputs.version }} -t smartdns-rs:${{ inputs.version }} .
           docker tag smartdns-rs:${{ inputs.version }} ghcr.io/${{ github.actor }}/smartdns-rs:${{ inputs.version }}
       -
         name: Login to GitHub Container Registry
